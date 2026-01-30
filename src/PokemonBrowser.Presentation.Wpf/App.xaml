@@ -1,0 +1,9 @@
+﻿<Application x:Class="PokemonBrowser.Presentation.Wpf.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- Composition root lives in App.xaml.cs via Generic Host + DI. -->
+    <Application.ShutdownMode>OnMainWindowClose</Application.ShutdownMode>
+    <Application.Resources>
+      
+    </Application.Resources>
+</Application>
