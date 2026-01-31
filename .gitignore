@@ -13,3 +13,7 @@ obj/
 
 ## Rider
 .idea/
+
+## Local reference project (do not commit)
+pokemon-browser_working/
+work/
