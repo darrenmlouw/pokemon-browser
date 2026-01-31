@@ -111,6 +111,8 @@
                             <DataTemplate>
                                 <DockPanel Margin="4">
                                     <Image DockPanel.Dock="Left" Width="52" Height="52" Margin="0,0,10,0"
+                                           Stretch="Uniform"
+                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
                                            Source="{Binding SpriteUrl}" />
                                     <StackPanel>
                                         <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
