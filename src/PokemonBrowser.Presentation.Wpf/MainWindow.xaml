@@ -3,10 +3,88 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:PokemonBrowser.Presentation.Wpf"
+        xmlns:vm="clr-namespace:PokemonBrowser.Presentation.Wpf.ViewModels"
         mc:Ignorable="d"
+        d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
         Title="Pokemon Browser" Height="720" Width="1100">
-    <Grid>
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
+    </Window.Resources>
+
+    <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,12">
+            <TextBlock Text="Pokemon Browser" FontSize="20" FontWeight="SemiBold" DockPanel.Dock="Left" />
+            <Button Content="Refresh" Width="110" Command="{Binding RefreshCommand}" DockPanel.Dock="Right" />
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="420" />
+                <ColumnDefinition Width="16" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" BorderBrush="#33000000" BorderThickness="1" CornerRadius="6" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <TextBox Width="260" Height="28" VerticalContentAlignment="Center"
+                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+                        <Button Content="Clear" Width="80" Margin="10,0,0,0" Command="{Binding ClearSearchCommand}" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
+                        <ProgressBar Width="200" Height="8" IsIndeterminate="True"
+                                     Visibility="{Binding IsLoadingList, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#77000000"
+                                   Text="{Binding ListStatusText}" />
+                    </StackPanel>
+
+                    <ListBox Grid.Row="2"
+                             ItemsSource="{Binding FilteredPokemon}"
+                             SelectedItem="{Binding SelectedPokemon, Mode=TwoWay}">
+                        <ListBox.ItemTemplate>
+                            <DataTemplate>
+                                <DockPanel Margin="4">
+                                    <Image DockPanel.Dock="Left" Width="52" Height="52" Margin="0,0,10,0"
+                                           Source="{Binding SpriteUrl}" />
+                                    <StackPanel>
+                                        <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
+                                        <TextBlock Foreground="#77000000" Text="{Binding PrimaryType}" />
+                                    </StackPanel>
+                                </DockPanel>
+                            </DataTemplate>
+                        </ListBox.ItemTemplate>
+                    </ListBox>
+                </Grid>
+            </Border>
+
+            <Border Grid.Column="2" BorderBrush="#33000000" BorderThickness="1" CornerRadius="6" Padding="12">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <TextBlock Foreground="#CCB00020" TextWrapping="Wrap"
+                               Text="{Binding ErrorMessage}"
+                               Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}" />
+
+                    <TextBlock Grid.Row="1" Foreground="#77000000" VerticalAlignment="Center" HorizontalAlignment="Center"
+                               Text="Details panel comes next (feature/07-details-panel)." />
+                </Grid>
+            </Border>
+        </Grid>
 
     </Grid>
 </Window>

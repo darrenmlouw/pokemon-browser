@@ -8,8 +8,9 @@ namespace PokemonBrowser.Presentation.Wpf;
 /// </summary>
 public partial class MainWindow : Window
 {
-    public MainWindow() : this(new MainViewModel())
+    public MainWindow()
     {
+        InitializeComponent();
     }
 
     public MainWindow(MainViewModel viewModel)
