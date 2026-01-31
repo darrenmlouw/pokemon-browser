@@ -110,10 +110,12 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Margin="4">
-                                    <Border DockPanel.Dock="Left" Width="52" Height="52" Margin="0,0,10,0"
-                                            CornerRadius="10" Background="#0A000000" ClipToBounds="True">
+                                    <Border DockPanel.Dock="Left" Width="60" Height="60" Margin="0,0,10,0"
+                                            CornerRadius="12" Background="#0A000000" ClipToBounds="True"
+                                            SnapsToDevicePixels="True">
                                         <Image Stretch="UniformToFill"
-                                               RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               SnapsToDevicePixels="True"
                                                Source="{Binding SpriteUrl}" />
                                     </Border>
                                     <StackPanel>
