@@ -13,15 +13,21 @@ public sealed class MainViewModel : ObservableObject
     private readonly Dispatcher _uiDispatcher;
     private readonly ObservableCollection<PokemonListItemViewModel> _pokemon = [];
     private CancellationTokenSource? _loadCts;
+    private CancellationTokenSource? _detailsCts;
 
     private const int StartupTypeEnrichmentCount = 30;
     private const int TypeEnrichmentConcurrency = 2;
 
     private string _searchText = string.Empty;
     private bool _isLoadingList;
-    private string _errorMessage = string.Empty;
+    private string _listErrorMessage = string.Empty;
     private string _listStatusText = string.Empty;
     private PokemonListItemViewModel? _selectedPokemon;
+
+    private bool _isLoadingDetails;
+    private string _detailsStatusText = "Select a Pokemon to see details.";
+    private string _detailsErrorMessage = string.Empty;
+    private PokemonDetailsViewModel? _pokemonDetails;
 
     public MainViewModel(IPokemonService pokemonService)
     {
@@ -71,19 +77,19 @@ public sealed class MainViewModel : ObservableObject
         }
     }
 
-    public string ErrorMessage
+    public string ListErrorMessage
     {
-        get => _errorMessage;
+        get => _listErrorMessage;
         private set
         {
-            if (SetProperty(ref _errorMessage, value))
+            if (SetProperty(ref _listErrorMessage, value))
             {
-                OnPropertyChanged(nameof(HasError));
+                OnPropertyChanged(nameof(HasListError));
             }
         }
     }
 
-    public bool HasError => !string.IsNullOrWhiteSpace(ErrorMessage);
+    public bool HasListError => !string.IsNullOrWhiteSpace(ListErrorMessage);
 
     public string ListStatusText
     {
@@ -94,8 +100,54 @@ public sealed class MainViewModel : ObservableObject
     public PokemonListItemViewModel? SelectedPokemon
     {
         get => _selectedPokemon;
-        set => SetProperty(ref _selectedPokemon, value);
+        set
+        {
+            if (SetProperty(ref _selectedPokemon, value))
+            {
+                _ = LoadSelectedPokemonDetailsAsync();
+            }
+        }
     }
+
+    public bool IsLoadingDetails
+    {
+        get => _isLoadingDetails;
+        private set => SetProperty(ref _isLoadingDetails, value);
+    }
+
+    public string DetailsStatusText
+    {
+        get => _detailsStatusText;
+        private set => SetProperty(ref _detailsStatusText, value);
+    }
+
+    public string DetailsErrorMessage
+    {
+        get => _detailsErrorMessage;
+        private set
+        {
+            if (SetProperty(ref _detailsErrorMessage, value))
+            {
+                OnPropertyChanged(nameof(HasDetailsError));
+            }
+        }
+    }
+
+    public bool HasDetailsError => !string.IsNullOrWhiteSpace(DetailsErrorMessage);
+
+    public PokemonDetailsViewModel? PokemonDetails
+    {
+        get => _pokemonDetails;
+        private set
+        {
+            if (SetProperty(ref _pokemonDetails, value))
+            {
+                OnPropertyChanged(nameof(HasPokemonDetails));
+            }
+        }
+    }
+
+    public bool HasPokemonDetails => PokemonDetails is not null;
 
     private async Task RefreshAsync()
     {
@@ -105,12 +157,13 @@ public sealed class MainViewModel : ObservableObject
 
         try
         {
-            ErrorMessage = string.Empty;
+            ListErrorMessage = string.Empty;
             IsLoadingList = true;
             ListStatusText = "Loading first generation (151)...";
 
             _pokemon.Clear();
             SelectedPokemon = null;
+            ClearDetails();
 
             var list = await _pokemonService.GetFirstGenPokemonAsync(forceRefresh: true, cancellationToken: ct).ConfigureAwait(true);
 
@@ -131,12 +184,57 @@ public sealed class MainViewModel : ObservableObject
         }
         catch (Exception ex)
         {
-            ErrorMessage = ex.Message;
+            ListErrorMessage = ex.Message;
             ListStatusText = "Failed to load";
         }
         finally
         {
             IsLoadingList = false;
+        }
+    }
+
+    private async Task LoadSelectedPokemonDetailsAsync()
+    {
+        CancelInFlightDetailsLoad();
+
+        PokemonDetails = null;
+        DetailsErrorMessage = string.Empty;
+
+        if (SelectedPokemon is null)
+        {
+            DetailsStatusText = "Select a Pokemon to see details.";
+            return;
+        }
+
+        _detailsCts = new CancellationTokenSource();
+        var ct = _detailsCts.Token;
+
+        try
+        {
+            IsLoadingDetails = true;
+            DetailsStatusText = $"Loading {SelectedPokemon.DisplayName}...";
+
+            var details = await _pokemonService.GetPokemonDetailsAsync(SelectedPokemon.Name, cancellationToken: ct);
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
+
+            PokemonDetails = new PokemonDetailsViewModel(details);
+            DetailsStatusText = string.Empty;
+        }
+        catch (OperationCanceledException)
+        {
+            // ignored
+        }
+        catch (Exception ex)
+        {
+            DetailsErrorMessage = ex.Message;
+            DetailsStatusText = "Failed to load details";
+        }
+        finally
+        {
+            IsLoadingDetails = false;
         }
     }
 
@@ -194,6 +292,32 @@ public sealed class MainViewModel : ObservableObject
         {
             _loadCts = null;
         }
+    }
+
+    private void CancelInFlightDetailsLoad()
+    {
+        try
+        {
+            _detailsCts?.Cancel();
+            _detailsCts?.Dispose();
+        }
+        catch
+        {
+            // ignored
+        }
+        finally
+        {
+            _detailsCts = null;
+        }
+    }
+
+    private void ClearDetails()
+    {
+        CancelInFlightDetailsLoad();
+        PokemonDetails = null;
+        DetailsErrorMessage = string.Empty;
+        DetailsStatusText = "Select a Pokemon to see details.";
+        IsLoadingDetails = false;
     }
 
 }
