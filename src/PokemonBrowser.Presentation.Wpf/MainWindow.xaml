@@ -110,10 +110,12 @@
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Margin="4">
-                                    <Image DockPanel.Dock="Left" Width="52" Height="52" Margin="0,0,10,0"
-                                           Stretch="Uniform"
-                                           RenderOptions.BitmapScalingMode="NearestNeighbor"
-                                           Source="{Binding SpriteUrl}" />
+                                    <Border DockPanel.Dock="Left" Width="52" Height="52" Margin="0,0,10,0"
+                                            CornerRadius="10" Background="#0A000000" ClipToBounds="True">
+                                        <Image Stretch="UniformToFill"
+                                               RenderOptions.BitmapScalingMode="NearestNeighbor"
+                                               Source="{Binding SpriteUrl}" />
+                                    </Border>
                                     <StackPanel>
                                         <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
                                         <TextBlock Foreground="#77000000" Text="{Binding PrimaryType}" />
