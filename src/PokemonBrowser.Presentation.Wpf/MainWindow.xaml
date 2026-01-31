@@ -19,7 +19,6 @@
 
         <DockPanel Grid.Row="0" Margin="0,0,0,12">
             <TextBlock Text="Pokemon Browser" FontSize="20" FontWeight="SemiBold" DockPanel.Dock="Left" />
-            <Button Content="Refresh" Width="110" Command="{Binding RefreshCommand}" DockPanel.Dock="Right" />
         </DockPanel>
 
         <Grid Grid.Row="1">
@@ -38,11 +37,61 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                        <TextBox Width="260" Height="28" VerticalContentAlignment="Center"
-                                 Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
-                        <Button Content="Clear" Width="80" Margin="10,0,0,0" Command="{Binding ClearSearchCommand}" />
-                    </StackPanel>
+                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <Grid Grid.Column="0" Margin="0,0,10,0">
+                            <TextBox x:Name="SearchBox" Height="30" VerticalContentAlignment="Center"
+                                     Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
+
+                            <TextBlock Text="Search..." Foreground="#99000000" Margin="10,0,0,0"
+                                       VerticalAlignment="Center" IsHitTestVisible="False">
+                                <TextBlock.Style>
+                                    <Style TargetType="TextBlock">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                        <Style.Triggers>
+                                            <MultiDataTrigger>
+                                                <MultiDataTrigger.Conditions>
+                                                    <Condition Binding="{Binding ElementName=SearchBox, Path=Text}" Value="" />
+                                                    <Condition Binding="{Binding ElementName=SearchBox, Path=IsKeyboardFocusWithin}" Value="False" />
+                                                </MultiDataTrigger.Conditions>
+                                                <Setter Property="Visibility" Value="Visible" />
+                                            </MultiDataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </TextBlock.Style>
+                            </TextBlock>
+                        </Grid>
+
+                        <StackPanel Grid.Column="1" Orientation="Horizontal">
+                            <Button Width="32" Height="32" Padding="0" Margin="0,0,10,0"
+                                    Command="{Binding ClearSearchCommand}" ToolTip="Clear search">
+                                <Button.Style>
+                                    <Style TargetType="Button">
+                                        <Setter Property="IsEnabled" Value="True" />
+                                        <Setter Property="Opacity" Value="1" />
+                                        <Style.Triggers>
+                                            <DataTrigger Binding="{Binding ElementName=SearchBox, Path=Text}" Value="">
+                                                <Setter Property="IsEnabled" Value="False" />
+                                                <Setter Property="Opacity" Value="0.35" />
+                                            </DataTrigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE711;"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Button>
+
+                            <Button Width="32" Height="32" Padding="0"
+                                    Command="{Binding RefreshCommand}" ToolTip="Refresh">
+                                <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE72C;"
+                                           HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Button>
+                        </StackPanel>
+                    </Grid>
 
                     <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
                         <ProgressBar Width="200" Height="8" IsIndeterminate="True"
