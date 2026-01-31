@@ -34,6 +34,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
@@ -50,7 +51,11 @@
                                    Text="{Binding ListStatusText}" />
                     </StackPanel>
 
-                    <ListBox Grid.Row="2"
+                    <TextBlock Grid.Row="2" Margin="0,0,0,10" Foreground="#CCB00020" TextWrapping="Wrap"
+                               Text="{Binding ListErrorMessage}"
+                               Visibility="{Binding HasListError, Converter={StaticResource BoolToVisibility}}" />
+
+                    <ListBox Grid.Row="3"
                              ItemsSource="{Binding FilteredPokemon}"
                              SelectedItem="{Binding SelectedPokemon, Mode=TwoWay}">
                         <ListBox.ItemTemplate>
@@ -73,15 +78,110 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <TextBlock Foreground="#CCB00020" TextWrapping="Wrap"
-                               Text="{Binding ErrorMessage}"
-                               Visibility="{Binding HasError, Converter={StaticResource BoolToVisibility}}" />
+                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
+                        <ProgressBar Width="200" Height="8" IsIndeterminate="True"
+                                     Visibility="{Binding IsLoadingDetails, Converter={StaticResource BoolToVisibility}}" />
+                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#77000000"
+                                   Text="{Binding DetailsStatusText}" />
+                    </StackPanel>
 
-                    <TextBlock Grid.Row="1" Foreground="#77000000" VerticalAlignment="Center" HorizontalAlignment="Center"
-                               Text="Details panel comes next (feature/07-details-panel)." />
+                    <TextBlock Grid.Row="1" Margin="0,0,0,10" Foreground="#CCB00020" TextWrapping="Wrap"
+                               Text="{Binding DetailsErrorMessage}"
+                               Visibility="{Binding HasDetailsError, Converter={StaticResource BoolToVisibility}}" />
+
+                    <Grid Grid.Row="2">
+                        <TextBlock Foreground="#77000000" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                                   Text="Select a Pokemon from the list to see details.">
+                            <TextBlock.Style>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <MultiDataTrigger>
+                                            <MultiDataTrigger.Conditions>
+                                                <Condition Binding="{Binding HasPokemonDetails}" Value="False" />
+                                                <Condition Binding="{Binding IsLoadingDetails}" Value="False" />
+                                            </MultiDataTrigger.Conditions>
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </MultiDataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBlock.Style>
+                        </TextBlock>
+
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+                            <ScrollViewer.Style>
+                                <Style TargetType="ScrollViewer">
+                                    <Setter Property="Visibility" Value="Collapsed" />
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding HasPokemonDetails}" Value="True">
+                                            <Setter Property="Visibility" Value="Visible" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </ScrollViewer.Style>
+
+                            <Grid DataContext="{Binding PokemonDetails}">
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
+                                    <TextBlock DockPanel.Dock="Left" FontSize="22" FontWeight="SemiBold"
+                                               Text="{Binding DisplayName}" />
+                                    <TextBlock DockPanel.Dock="Right" Foreground="#77000000" VerticalAlignment="Bottom"
+                                               HorizontalAlignment="Right">
+                                        <Run Text="#" />
+                                        <Run Text="{Binding Id, Mode=OneWay, StringFormat={}{0:000}}" />
+                                    </TextBlock>
+                                </DockPanel>
+
+                                <Image Grid.Row="1" Width="240" Height="240" Stretch="Uniform"
+                                       HorizontalAlignment="Left" Margin="0,0,0,12"
+                                       Source="{Binding ImageUrl}" />
+
+                                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
+                                    <TextBlock Foreground="#77000000" Text="Types:" />
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding TypesDisplay}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,12">
+                                    <TextBlock Foreground="#77000000" Text="Height:" />
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding HeightMetersDisplay}" />
+                                    <TextBlock Margin="18,0,0,0" Foreground="#77000000" Text="Weight:" />
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding WeightKgDisplay}" />
+                                </StackPanel>
+
+                                <StackPanel Grid.Row="4">
+                                    <TextBlock Margin="0,0,0,6" FontSize="16" FontWeight="SemiBold" Text="Base stats" />
+                                    <ItemsControl ItemsSource="{Binding BaseStats}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,6,0,0">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="110" />
+                                                        <ColumnDefinition Width="*" />
+                                                        <ColumnDefinition Width="40" />
+                                                    </Grid.ColumnDefinitions>
+                                                    <TextBlock Grid.Column="0" Foreground="#77000000" Text="{Binding DisplayName}" />
+                                                    <ProgressBar Grid.Column="1" Height="10" Margin="10,4,10,0"
+                                                                 Maximum="255" Value="{Binding Value}" />
+                                                    <TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Value}" />
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </StackPanel>
+                            </Grid>
+                        </ScrollViewer>
+                    </Grid>
                 </Grid>
             </Border>
         </Grid>
