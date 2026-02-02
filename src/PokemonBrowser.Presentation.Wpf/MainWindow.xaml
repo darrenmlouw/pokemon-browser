@@ -1,4 +1,4 @@
-﻿<Window x:Class="PokemonBrowser.Presentation.Wpf.MainWindow"
+<Window x:Class="PokemonBrowser.Presentation.Wpf.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -6,29 +6,76 @@
         xmlns:vm="clr-namespace:PokemonBrowser.Presentation.Wpf.ViewModels"
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=vm:MainViewModel}"
-        Title="Pokemon Browser" Height="720" Width="1100">
+        Title="Pokemon Browser" 
+        Height="680" 
+        Width="1100"
+        MinHeight="680"
+        MinWidth="1100"
+        Background="{DynamicResource AppBackgroundGradientBrush}"
+        Foreground="{DynamicResource TextBrush}">
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVisibility" />
     </Window.Resources>
 
-    <Grid Margin="16">
+    <Grid Margin="16 8 16 16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <DockPanel Grid.Row="0" Margin="0,0,0,12">
-            <TextBlock Text="Pokemon Browser" FontSize="20" FontWeight="SemiBold" DockPanel.Dock="Left" />
-        </DockPanel>
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Grid.Column="0" Text="Pokemon Browser" FontSize="22" FontWeight="SemiBold" VerticalAlignment="Center" Margin="8 0 0 0" />
+
+            <ToggleButton Grid.Column="1"
+                          IsChecked="{Binding IsDarkMode, Mode=TwoWay}"
+                          Style="{StaticResource IconToggleButtonStyle}"
+                          ToolTip="Toggle theme"
+                          AutomationProperties.Name="Toggle theme">
+                <Grid>
+                    <!-- Light mode icon (shown when IsDarkMode=false) -->
+                    <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE706;">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Visible" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                        <Setter Property="Visibility" Value="Collapsed" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+
+                    <!-- Dark mode icon (shown when IsDarkMode=true) -->
+                    <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE708;">
+                        <TextBlock.Style>
+                            <Style TargetType="TextBlock">
+                                <Setter Property="Visibility" Value="Collapsed" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsChecked, RelativeSource={RelativeSource AncestorType=ToggleButton}}" Value="True">
+                                        <Setter Property="Visibility" Value="Visible" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBlock.Style>
+                    </TextBlock>
+                </Grid>
+            </ToggleButton>
+        </Grid>
 
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="420" />
+                <ColumnDefinition Width="320" />
                 <ColumnDefinition Width="16" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
 
-            <Border Grid.Column="0" BorderBrush="#33000000" BorderThickness="1" CornerRadius="6" Padding="12">
+            <Border Grid.Column="0" Style="{StaticResource CardStyle}" Padding="8">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -37,17 +84,17 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <Grid Grid.Row="0" Margin="0,0,0,10">
+                    <Grid Grid.Row="0" Margin="0,0,0,0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
-                        <Grid Grid.Column="0" Margin="0,0,10,0">
-                            <TextBox x:Name="SearchBox" Height="30" VerticalContentAlignment="Center"
+                        <Grid Grid.Column="0" Margin="0,0,4,0">
+                            <TextBox x:Name="SearchBox" Height="30" VerticalContentAlignment="Center" Padding="8,0,8,0"
                                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock Text="Search..." Foreground="#99000000" Margin="10,0,0,0"
+                            <TextBlock Text="Search..." Foreground="{DynamicResource TextMutedBrush}" Opacity="0.75" Margin="8,0,8,0"
                                        VerticalAlignment="Center" IsHitTestVisible="False">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -67,10 +114,10 @@
                         </Grid>
 
                         <StackPanel Grid.Column="1" Orientation="Horizontal">
-                            <Button Width="32" Height="32" Padding="0" Margin="0,0,10,0"
+                            <Button Width="32" Height="32" Padding="0" Margin="0,0,4,0"
                                     Command="{Binding ClearSearchCommand}" ToolTip="Clear search">
                                 <Button.Style>
-                                    <Style TargetType="Button">
+                                    <Style TargetType="Button" BasedOn="{StaticResource IconButtonStyle}">
                                         <Setter Property="IsEnabled" Value="True" />
                                         <Setter Property="Opacity" Value="1" />
                                         <Style.Triggers>
@@ -85,7 +132,7 @@
                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
                             </Button>
 
-                            <Button Width="32" Height="32" Padding="0"
+                            <Button Width="32" Height="32" Padding="0" Style="{StaticResource IconButtonStyle}"
                                     Command="{Binding RefreshCommand}" ToolTip="Refresh">
                                 <TextBlock FontFamily="Segoe MDL2 Assets" FontSize="16" Text="&#xE72C;"
                                            HorizontalAlignment="Center" VerticalAlignment="Center" />
@@ -93,34 +140,36 @@
                         </StackPanel>
                     </Grid>
 
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,10">
-                        <ProgressBar Width="200" Height="8" IsIndeterminate="True"
+                    <Grid Grid.Row="1">
+                        <ProgressBar Height="8"
+                                     Margin="0 8 16 8"
+                                     IsIndeterminate="True"
+                                     HorizontalAlignment="Stretch"
                                      Visibility="{Binding IsLoadingList, Converter={StaticResource BoolToVisibility}}" />
-                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#77000000"
-                                   Text="{Binding ListStatusText}" />
-                    </StackPanel>
+                    </Grid>
 
-                    <TextBlock Grid.Row="2" Margin="0,0,0,10" Foreground="#CCB00020" TextWrapping="Wrap"
+                    <TextBlock Grid.Row="2" Margin="8" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap" FontWeight="SemiBold" FontStyle="Italic"
                                Text="{Binding ListErrorMessage}"
                                Visibility="{Binding HasListError, Converter={StaticResource BoolToVisibility}}" />
 
                     <ListBox Grid.Row="3"
+                             Padding="0"
+                             Margin="0"
                              ItemsSource="{Binding FilteredPokemon}"
                              SelectedItem="{Binding SelectedPokemon, Mode=TwoWay}">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <DockPanel Margin="4">
-                                    <Border DockPanel.Dock="Left" Width="60" Height="60" Margin="0,0,10,0"
-                                            CornerRadius="12" Background="#0A000000" ClipToBounds="True"
+                                    <Border DockPanel.Dock="Left" Width="60" Height="60" Margin="0,0,12,0"
+                                            CornerRadius="14" Background="{DynamicResource ImagePlaceholderBrush}" ClipToBounds="True"
                                             SnapsToDevicePixels="True">
                                         <Image Stretch="UniformToFill"
                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                SnapsToDevicePixels="True"
-                                               Source="{Binding SpriteUrl}" />
+                                                 Source="{Binding SpriteImage}" />
                                     </Border>
-                                    <StackPanel>
-                                        <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}" />
-                                        <TextBlock Foreground="#77000000" Text="{Binding PrimaryType}" />
+                                    <StackPanel VerticalAlignment="Center">
+                                        <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}"/>
                                     </StackPanel>
                                 </DockPanel>
                             </DataTemplate>
@@ -129,7 +178,7 @@
                 </Grid>
             </Border>
 
-            <Border Grid.Column="2" BorderBrush="#33000000" BorderThickness="1" CornerRadius="6" Padding="12">
+            <Border Grid.Column="2" Style="{StaticResource CardStyle}">
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
@@ -137,19 +186,19 @@
                         <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <StackPanel Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,10">
-                        <ProgressBar Width="200" Height="8" IsIndeterminate="True"
-                                     Visibility="{Binding IsLoadingDetails, Converter={StaticResource BoolToVisibility}}" />
-                        <TextBlock Margin="10,0,0,0" VerticalAlignment="Center" Foreground="#77000000"
-                                   Text="{Binding DetailsStatusText}" />
-                    </StackPanel>
+                    <Grid Grid.Row="0" Margin="0,0,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
 
-                    <TextBlock Grid.Row="1" Margin="0,0,0,10" Foreground="#CCB00020" TextWrapping="Wrap"
-                               Text="{Binding DetailsErrorMessage}"
-                               Visibility="{Binding HasDetailsError, Converter={StaticResource BoolToVisibility}}" />
+                        <ProgressBar Grid.Column="0" Height="8" IsIndeterminate="True" HorizontalAlignment="Stretch" VerticalAlignment="Center"
+                                     Margin="0,0,0,0"
+                                     Visibility="{Binding IsLoadingDetails, Converter={StaticResource BoolToVisibility}}" />
+                    </Grid>
 
                     <Grid Grid.Row="2">
-                        <TextBlock Foreground="#77000000" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <TextBlock Foreground="{DynamicResource TextMutedBrush}" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center"
                                    Text="Select a Pokemon from the list to see details.">
                             <TextBlock.Style>
                                 <Style TargetType="TextBlock">
@@ -188,47 +237,62 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
 
-                                <DockPanel Grid.Row="0" Margin="0,0,0,10">
-                                    <TextBlock DockPanel.Dock="Left" FontSize="22" FontWeight="SemiBold"
+                                <DockPanel Grid.Row="0" Margin="0,0,0,0">
+                                    <TextBlock DockPanel.Dock="Left" FontSize="28" FontWeight="Bold" VerticalAlignment="Bottom"
                                                Text="{Binding DisplayName}" />
-                                    <TextBlock DockPanel.Dock="Right" Foreground="#77000000" VerticalAlignment="Bottom"
+                                    <TextBlock DockPanel.Dock="Right" Style="{StaticResource MutedText}" VerticalAlignment="Bottom" Margin="0 0 0 4"
                                                HorizontalAlignment="Right">
                                         <Run Text="#" />
                                         <Run Text="{Binding Id, Mode=OneWay, StringFormat={}{0:000}}" />
                                     </TextBlock>
                                 </DockPanel>
 
-                                <Image Grid.Row="1" Width="240" Height="240" Stretch="Uniform"
-                                       HorizontalAlignment="Left" Margin="0,0,0,12"
-                                       Source="{Binding ImageUrl}" />
+                                <Border Grid.Row="1" Width="240" Height="240" HorizontalAlignment="Left" Margin="0,0,0,12"
+                                        Background="Transparent" CornerRadius="14" SnapsToDevicePixels="True" CacheMode="BitmapCache">
+                                    <Border.Effect>
+                                        <DropShadowEffect BlurRadius="26"
+                                                          ShadowDepth="10"
+                                                          Opacity="0.32"
+                                                          Color="{DynamicResource CardShadowColor}"
+                                                          RenderingBias="Quality" />
+                                    </Border.Effect>
+                                    <Grid>
+                                        <ProgressBar Height="8"
+                                                     Width="160"
+                                                     IsIndeterminate="True"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     Visibility="{Binding IsArtworkLoading, Converter={StaticResource BoolToVisibility}}" />
 
-                                <StackPanel Grid.Row="2" Orientation="Horizontal" Margin="0,0,0,8">
-                                    <TextBlock Foreground="#77000000" Text="Types:" />
-                                    <TextBlock Margin="8,0,0,0" Text="{Binding TypesDisplay}" />
-                                </StackPanel>
+                                        <Image Stretch="Uniform"
+                                               Source="{Binding ArtworkImage}"
+                                               SnapsToDevicePixels="True"
+                                               Visibility="{Binding IsHighResArtwork, Converter={StaticResource BoolToVisibility}}" />
+                                    </Grid>
+                                </Border>
 
                                 <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,12">
-                                    <TextBlock Foreground="#77000000" Text="Height:" />
-                                    <TextBlock Margin="8,0,0,0" Text="{Binding HeightMetersDisplay}" />
-                                    <TextBlock Margin="18,0,0,0" Foreground="#77000000" Text="Weight:" />
-                                    <TextBlock Margin="8,0,0,0" Text="{Binding WeightKgDisplay}" />
+                                    <TextBlock Style="{StaticResource MutedText}" Text="Height:" FontSize="14" />
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding HeightMetersDisplay}" FontSize="14" />
+                                    <TextBlock Margin="18,0,0,0" Style="{StaticResource MutedText}" Text="Weight:" FontSize="14" />
+                                    <TextBlock Margin="8,0,0,0" Text="{Binding WeightKgDisplay}" FontSize="14" />
                                 </StackPanel>
 
                                 <StackPanel Grid.Row="4">
-                                    <TextBlock Margin="0,0,0,6" FontSize="16" FontWeight="SemiBold" Text="Base stats" />
+                                    <TextBlock Margin="0,0,0,6" FontSize="18" FontWeight="SemiBold" Text="Base stats" />
                                     <ItemsControl ItemsSource="{Binding BaseStats}">
                                         <ItemsControl.ItemTemplate>
                                             <DataTemplate>
-                                                <Grid Margin="0,6,0,0">
+                                                <Grid Margin="0,8,0,0">
                                                     <Grid.ColumnDefinitions>
-                                                        <ColumnDefinition Width="110" />
+                                                        <ColumnDefinition Width="54" />
                                                         <ColumnDefinition Width="*" />
-                                                        <ColumnDefinition Width="40" />
+                                                        <ColumnDefinition Width="24" />
                                                     </Grid.ColumnDefinitions>
-                                                    <TextBlock Grid.Column="0" Foreground="#77000000" Text="{Binding DisplayName}" />
-                                                    <ProgressBar Grid.Column="1" Height="10" Margin="10,4,10,0"
+                                                    <TextBlock Grid.Column="0" VerticalAlignment="Center" Style="{StaticResource MutedText}" Text="{Binding DisplayName}" FontSize="14" />
+                                                    <ProgressBar Grid.Column="1" Height="10" VerticalAlignment="Center" Margin="12,0,12,0"
                                                                  Maximum="255" Value="{Binding Value}" />
-                                                    <TextBlock Grid.Column="2" HorizontalAlignment="Right" Text="{Binding Value}" />
+                                                    <TextBlock Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Text="{Binding Value}" FontSize="14" />
                                                 </Grid>
                                             </DataTemplate>
                                         </ItemsControl.ItemTemplate>

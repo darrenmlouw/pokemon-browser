@@ -1,8 +1,11 @@
 ﻿using System.Windows;
+using System;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using PokemonBrowser.Infrastructure;
+using PokemonBrowser.Presentation.Wpf.Services;
 using PokemonBrowser.Presentation.Wpf.ViewModels;
 
 namespace PokemonBrowser.Presentation.Wpf
@@ -31,6 +34,18 @@ namespace PokemonBrowser.Presentation.Wpf
                 {
                     services.AddInfrastructure();
 
+                    services.AddHttpClient("Sprites", client =>
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(10);
+                        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("PokemonBrowser", "1.0"));
+                        client.DefaultRequestHeaders.Accept.ParseAdd("image/png,image/*;q=0.9,*/*;q=0.1");
+                    });
+
+                    services.AddSingleton<ISpriteImageLoader, SpriteImageLoader>();
+
+                    services.AddSingleton<ThemeSettingsStore>();
+                    services.AddSingleton<IThemeService, ThemeService>();
+
                     services.AddSingleton<MainViewModel>();
                     services.AddSingleton<MainWindow>();
                 })
@@ -38,8 +53,16 @@ namespace PokemonBrowser.Presentation.Wpf
 
             _host.Start();
 
+            var themeService = _host.Services.GetRequiredService<IThemeService>();
+            themeService.Initialize();
+
             var mainWindow = _host.Services.GetRequiredService<MainWindow>();
             MainWindow = mainWindow;
+
+            // Ensure window chrome follows the selected theme on first show
+            // (avoids needing an extra toggle and reduces white title-bar flash).
+            themeService.ApplyThemeToWindow(mainWindow);
+
             mainWindow.Show();
         }
 

@@ -13,7 +13,10 @@ Pokemon Browser is a small WPF application built for the JoyConnect technical ch
 - Detail view shows: name, image, height, weight, all types, base stats
 - Commands (`ICommand`) + bindings, `ObservableCollection`, `DataTemplate`
 - Dependency injection via `Microsoft.Extensions.Hosting`
-- Bonus: loading indicators + in-memory caching in the service + disk image caching for sprites
+- Bonus: loading indicators + in-memory caching in the service layer
+- Bonus: image loading is cached + resilient (avoids blank sprites on fast scroll)
+- Bonus: light/dark theme toggle (persisted between runs)
+- Bonus: native Windows title bar switches with theme (best-effort via DWM)
 
 ## How to Run
 
@@ -25,6 +28,15 @@ From the repo root:
 2. `dotnet build`
 3. Run the WPF app from Visual Studio / VS Code, or:
   - `dotnet run --project src/PokemonBrowser.Presentation.Wpf/PokemonBrowser.Presentation.Wpf.csproj`
+
+Run tests:
+
+- `dotnet test`
+
+## Troubleshooting
+
+- If `dotnet build` fails with file-lock errors, a running instance of the WPF app (or Visual Studio) is holding the output DLL/EXE.
+  - Close the app and rebuild, or use `dotnet build -p:UseAppHost=false`.
 
 ## Architecture Notes
 
@@ -50,3 +62,7 @@ This solution uses **Clean Architecture** with **MVVM** in the WPF presentation 
 
 - PokeAPI list endpoint doesn’t include types, so the app loads the list quickly, then enriches list items with their types in the background (throttled).
 - Height/weight are converted from PokeAPI units (decimeters/hectograms) to meters/kg.
+
+## Notes
+
+- Theme preference is saved to `%APPDATA%\PokemonBrowser\settings.json`.

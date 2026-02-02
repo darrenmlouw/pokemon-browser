@@ -1,10 +1,15 @@
 using PokemonBrowser.Domain.Models;
 using PokemonBrowser.Presentation.Wpf.Mvvm;
+using System.Windows.Media;
 
 namespace PokemonBrowser.Presentation.Wpf.ViewModels;
 
 public sealed class PokemonDetailsViewModel : ObservableObject
 {
+    private ImageSource? _artworkImage;
+    private bool _isHighResArtwork;
+    private bool _isArtworkLoading;
+
     public PokemonDetailsViewModel(PokemonDetails model)
     {
         Id = model.Id;
@@ -28,6 +33,24 @@ public sealed class PokemonDetailsViewModel : ObservableObject
 
     public string ImageUrl { get; }
 
+    public ImageSource? ArtworkImage
+    {
+        get => _artworkImage;
+        private set => SetProperty(ref _artworkImage, value);
+    }
+
+    public bool IsHighResArtwork
+    {
+        get => _isHighResArtwork;
+        private set => SetProperty(ref _isHighResArtwork, value);
+    }
+
+    public bool IsArtworkLoading
+    {
+        get => _isArtworkLoading;
+        private set => SetProperty(ref _isArtworkLoading, value);
+    }
+
     public string TypesDisplay { get; }
 
     public string HeightMetersDisplay { get; }
@@ -35,6 +58,25 @@ public sealed class PokemonDetailsViewModel : ObservableObject
     public string WeightKgDisplay { get; }
 
     public IReadOnlyList<PokemonStatItemViewModel> BaseStats { get; }
+
+    public void SetArtworkImage(ImageSource? image)
+    {
+        ArtworkImage = image;
+        IsHighResArtwork = true;
+        IsArtworkLoading = false;
+    }
+
+    public void BeginArtworkLoading()
+    {
+        ArtworkImage = null;
+        IsHighResArtwork = false;
+        IsArtworkLoading = true;
+    }
+
+    public void EndArtworkLoading()
+    {
+        IsArtworkLoading = false;
+    }
 
     private static string Capitalize(string value)
     {
