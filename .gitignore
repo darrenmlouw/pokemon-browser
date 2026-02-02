@@ -1,0 +1,23 @@
+## Build
+bin/
+obj/
+
+## Build (alternate output)
+artifacts/
+**/artifacts/
+
+## VS
+.vs/
+
+## User files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Rider
+.idea/
+
+## Local reference project (do not commit)
+pokemon-browser_working/
+work/

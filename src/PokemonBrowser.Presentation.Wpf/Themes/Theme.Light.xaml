@@ -1,0 +1,45 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+  <!-- Modern light theme (soft + glassy) -->
+
+  <!-- Base surfaces -->
+  <LinearGradientBrush x:Key="AppBackgroundGradientBrush" StartPoint="0,0" EndPoint="1,1">
+    <GradientStop Color="#FFF6F8FC" Offset="0" />
+    <GradientStop Color="#FFF1F4FA" Offset="0.55" />
+    <GradientStop Color="#FFEFF3FB" Offset="1" />
+  </LinearGradientBrush>
+
+  <SolidColorBrush x:Key="SurfaceBrush" Color="#FFFFFFFF" />
+
+  <!-- Card: minimal/flat (less glass) -->
+  <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFFFF" />
+  <SolidColorBrush x:Key="CardBorderBrush" Color="#140F172A" />
+
+  <!-- Depth -->
+  <Color x:Key="CardShadowColor">#1A0F172A</Color>
+
+  <!-- Text -->
+  <SolidColorBrush x:Key="TextBrush" Color="#FF0F172A" />
+  <SolidColorBrush x:Key="TextMutedBrush" Color="#FF64748B" />
+
+  <!-- Accents -->
+  <SolidColorBrush x:Key="AccentBrush" Color="#FF2563EB" />
+  <SolidColorBrush x:Key="DangerBrush" Color="#FFB91C1C" />
+
+  <!-- Progress -->
+  <SolidColorBrush x:Key="ProgressTrackBrush" Color="#140F172A" />
+
+  <!-- Controls -->
+  <SolidColorBrush x:Key="ControlBackgroundBrush" Color="#FFFFFFFF" />
+  <SolidColorBrush x:Key="ControlBorderBrush" Color="#1F0F172A" />
+  <SolidColorBrush x:Key="ControlHoverBrush" Color="#FFF8FAFF" />
+  <SolidColorBrush x:Key="ControlPressedBrush" Color="#FFEEF2FF" />
+
+  <!-- List states -->
+  <SolidColorBrush x:Key="ListItemHoverBrush" Color="#0A2563EB" />
+  <SolidColorBrush x:Key="ListItemSelectedBrush" Color="#182563EB" />
+
+  <SolidColorBrush x:Key="ImagePlaceholderBrush" Color="#0A0F172A" />
+
+</ResourceDictionary>

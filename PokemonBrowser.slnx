@@ -1,0 +1,11 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PokemonBrowser.Application/PokemonBrowser.Application.csproj" />
+    <Project Path="src/PokemonBrowser.Domain/PokemonBrowser.Domain.csproj" />
+    <Project Path="src/PokemonBrowser.Infrastructure/PokemonBrowser.Infrastructure.csproj" />
+    <Project Path="src/PokemonBrowser.Presentation.Wpf/PokemonBrowser.Presentation.Wpf.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PokemonBrowser.Tests/PokemonBrowser.Tests.csproj" />
+  </Folder>
+</Solution>
