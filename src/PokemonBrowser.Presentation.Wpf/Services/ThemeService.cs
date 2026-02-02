@@ -56,6 +56,8 @@ public sealed class ThemeService : IThemeService
 
     public void ApplyThemeToWindow(System.Windows.Window window)
     {
+        // Keeps the native window chrome aligned with the app theme. This is best-effort and
+        // will no-op on unsupported Windows builds.
         TryApplyImmersiveDarkTitleBar(window, CurrentTheme == AppTheme.Dark);
     }
 

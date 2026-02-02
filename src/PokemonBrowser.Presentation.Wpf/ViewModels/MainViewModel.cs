@@ -12,6 +12,7 @@ public sealed class MainViewModel : ObservableObject
 {
     private readonly IPokemonService _pokemonService;
     private readonly IThemeService _themeService;
+    private readonly ISpriteImageLoader _spriteImageLoader;
     private readonly Dispatcher _uiDispatcher;
     private readonly ObservableCollection<PokemonListItemViewModel> _pokemon = [];
     private CancellationTokenSource? _loadCts;
@@ -32,10 +33,11 @@ public sealed class MainViewModel : ObservableObject
     private string _detailsErrorMessage = string.Empty;
     private PokemonDetailsViewModel? _pokemonDetails;
 
-    public MainViewModel(IPokemonService pokemonService, IThemeService themeService)
+    public MainViewModel(IPokemonService pokemonService, IThemeService themeService, ISpriteImageLoader spriteImageLoader)
     {
         _pokemonService = pokemonService;
         _themeService = themeService;
+        _spriteImageLoader = spriteImageLoader;
         _uiDispatcher = Dispatcher.CurrentDispatcher;
 
         _isDarkMode = _themeService.CurrentTheme == AppTheme.Dark;
@@ -187,7 +189,12 @@ public sealed class MainViewModel : ObservableObject
 
             foreach (var item in list)
             {
-                _pokemon.Add(new PokemonListItemViewModel(item));
+                var vm = new PokemonListItemViewModel(item);
+                _pokemon.Add(vm);
+
+                // Load sprites through our own loader/caching to avoid occasional blanks when
+                // scrolling fast (WPF's built-in URI image loader can cache transient failures).
+                _ = LoadSpriteAsync(vm, ct);
             }
 
             ListStatusText = $"Loaded {list.Count} Pokemon";
@@ -208,6 +215,29 @@ public sealed class MainViewModel : ObservableObject
         finally
         {
             IsLoadingList = false;
+        }
+    }
+
+    private async Task LoadSpriteAsync(PokemonListItemViewModel item, CancellationToken ct)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(item.SpriteUrl))
+            {
+                return;
+            }
+
+            var image = await _spriteImageLoader.LoadAsync(item.SpriteUrl, ct).ConfigureAwait(false);
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await _uiDispatcher.InvokeAsync(() => item.SetSpriteImage(image), DispatcherPriority.Background);
+        }
+        catch
+        {
+            // best-effort
         }
     }
 
@@ -238,7 +268,13 @@ public sealed class MainViewModel : ObservableObject
                 return;
             }
 
-            PokemonDetails = new PokemonDetailsViewModel(details);
+            var vm = new PokemonDetailsViewModel(details);
+
+            // Show a dedicated loading state until the high-res artwork is ready.
+            vm.BeginArtworkLoading();
+            PokemonDetails = vm;
+
+            _ = LoadArtworkAsync(vm, ct);
             DetailsStatusText = string.Empty;
         }
         catch (OperationCanceledException)
@@ -253,6 +289,38 @@ public sealed class MainViewModel : ObservableObject
         finally
         {
             IsLoadingDetails = false;
+        }
+    }
+
+    private async Task LoadArtworkAsync(PokemonDetailsViewModel details, CancellationToken ct)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(details.ImageUrl))
+            {
+                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background);
+                return;
+            }
+
+            var image = await _spriteImageLoader.LoadAsync(details.ImageUrl, ct).ConfigureAwait(false);
+            if (ct.IsCancellationRequested)
+            {
+                return;
+            }
+
+            await _uiDispatcher.InvokeAsync(() => details.SetArtworkImage(image), DispatcherPriority.Background);
+        }
+        catch
+        {
+            // best-effort
+            try
+            {
+                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background);
+            }
+            catch
+            {
+                // ignored
+            }
         }
     }
 

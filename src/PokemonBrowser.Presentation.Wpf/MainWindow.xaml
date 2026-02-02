@@ -91,10 +91,10 @@
                         </Grid.ColumnDefinitions>
 
                         <Grid Grid.Column="0" Margin="0,0,4,0">
-                            <TextBox x:Name="SearchBox" Height="30" VerticalContentAlignment="Center"
+                            <TextBox x:Name="SearchBox" Height="30" VerticalContentAlignment="Center" Padding="8,0,8,0"
                                      Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" />
 
-                            <TextBlock Text="Search..." Foreground="{DynamicResource TextMutedBrush}" Opacity="0.75" Margin="8,0,0,0"
+                            <TextBlock Text="Search..." Foreground="{DynamicResource TextMutedBrush}" Opacity="0.75" Margin="8,0,8,0"
                                        VerticalAlignment="Center" IsHitTestVisible="False">
                                 <TextBlock.Style>
                                     <Style TargetType="TextBlock">
@@ -166,7 +166,7 @@
                                         <Image Stretch="UniformToFill"
                                                RenderOptions.BitmapScalingMode="HighQuality"
                                                SnapsToDevicePixels="True"
-                                               Source="{Binding SpriteUrl}" />
+                                                 Source="{Binding SpriteImage}" />
                                     </Border>
                                     <StackPanel VerticalAlignment="Center">
                                         <TextBlock FontSize="16" FontWeight="SemiBold" Text="{Binding DisplayName}"/>
@@ -256,7 +256,19 @@
                                                           Color="{DynamicResource CardShadowColor}"
                                                           RenderingBias="Quality" />
                                     </Border.Effect>
-                                    <Image Stretch="Uniform" Source="{Binding ImageUrl}" />
+                                    <Grid>
+                                        <ProgressBar Height="8"
+                                                     Width="160"
+                                                     IsIndeterminate="True"
+                                                     HorizontalAlignment="Center"
+                                                     VerticalAlignment="Center"
+                                                     Visibility="{Binding IsArtworkLoading, Converter={StaticResource BoolToVisibility}}" />
+
+                                        <Image Stretch="Uniform"
+                                               Source="{Binding ArtworkImage}"
+                                               SnapsToDevicePixels="True"
+                                               Visibility="{Binding IsHighResArtwork, Converter={StaticResource BoolToVisibility}}" />
+                                    </Grid>
                                 </Border>
 
                                 <StackPanel Grid.Row="3" Orientation="Horizontal" Margin="0,0,0,12">

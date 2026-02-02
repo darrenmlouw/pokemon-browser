@@ -13,6 +13,7 @@ public sealed class ThemeSettingsStore
             Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData),
             "PokemonBrowser");
 
+        // Saved per-user (AppData\Roaming) so theme survives restarts.
         _settingsPath = Path.Combine(folder, "settings.json");
     }
 

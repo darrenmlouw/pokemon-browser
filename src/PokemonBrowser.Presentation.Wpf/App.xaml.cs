@@ -1,4 +1,6 @@
 ﻿using System.Windows;
+using System;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -31,6 +33,15 @@ namespace PokemonBrowser.Presentation.Wpf
                 .ConfigureServices(services =>
                 {
                     services.AddInfrastructure();
+
+                    services.AddHttpClient("Sprites", client =>
+                    {
+                        client.Timeout = TimeSpan.FromSeconds(10);
+                        client.DefaultRequestHeaders.UserAgent.Add(new ProductInfoHeaderValue("PokemonBrowser", "1.0"));
+                        client.DefaultRequestHeaders.Accept.ParseAdd("image/png,image/*;q=0.9,*/*;q=0.1");
+                    });
+
+                    services.AddSingleton<ISpriteImageLoader, SpriteImageLoader>();
 
                     services.AddSingleton<ThemeSettingsStore>();
                     services.AddSingleton<IThemeService, ThemeService>();

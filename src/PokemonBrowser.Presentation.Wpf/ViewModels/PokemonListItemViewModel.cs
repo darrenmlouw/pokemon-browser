@@ -1,11 +1,13 @@
 using PokemonBrowser.Domain.Models;
 using PokemonBrowser.Presentation.Wpf.Mvvm;
+using System.Windows.Media;
 
 namespace PokemonBrowser.Presentation.Wpf.ViewModels;
 
 public sealed class PokemonListItemViewModel : ObservableObject
 {
     private IReadOnlyList<string> _types;
+    private ImageSource? _spriteImage;
 
     public PokemonListItemViewModel(PokemonSummary model)
     {
@@ -23,6 +25,12 @@ public sealed class PokemonListItemViewModel : ObservableObject
 
     public string SpriteUrl { get; }
 
+    public ImageSource? SpriteImage
+    {
+        get => _spriteImage;
+        private set => SetProperty(ref _spriteImage, value);
+    }
+
     public string PrimaryType => _types.Count > 0 ? Capitalize(_types[0]) : string.Empty;
 
     public string TypesDisplay => _types.Count == 0 ? string.Empty : string.Join(", ", _types.Select(Capitalize));
@@ -32,6 +40,11 @@ public sealed class PokemonListItemViewModel : ObservableObject
         _types = types;
         OnPropertyChanged(nameof(PrimaryType));
         OnPropertyChanged(nameof(TypesDisplay));
+    }
+
+    public void SetSpriteImage(ImageSource? image)
+    {
+        SpriteImage = image;
     }
 
     private static string Capitalize(string value)
