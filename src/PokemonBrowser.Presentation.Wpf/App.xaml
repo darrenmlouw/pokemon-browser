@@ -4,6 +4,14 @@
     <!-- Composition root lives in App.xaml.cs via Generic Host + DI. -->
     <Application.ShutdownMode>OnMainWindowClose</Application.ShutdownMode>
     <Application.Resources>
-      
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!-- Default theme (ThemeService can swap this at runtime) -->
+                <ResourceDictionary Source="Themes/Theme.Light.xaml" />
+
+                <!-- Modern control styles (glass cards, rounded controls, shadows) -->
+                <ResourceDictionary Source="Themes/Controls.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

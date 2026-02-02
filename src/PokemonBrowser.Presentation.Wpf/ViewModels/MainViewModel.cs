@@ -4,12 +4,14 @@ using System.Windows.Data;
 using System.Windows.Threading;
 using PokemonBrowser.Application.Services;
 using PokemonBrowser.Presentation.Wpf.Mvvm;
+using PokemonBrowser.Presentation.Wpf.Services;
 
 namespace PokemonBrowser.Presentation.Wpf.ViewModels;
 
 public sealed class MainViewModel : ObservableObject
 {
     private readonly IPokemonService _pokemonService;
+    private readonly IThemeService _themeService;
     private readonly Dispatcher _uiDispatcher;
     private readonly ObservableCollection<PokemonListItemViewModel> _pokemon = [];
     private CancellationTokenSource? _loadCts;
@@ -19,6 +21,7 @@ public sealed class MainViewModel : ObservableObject
     private const int TypeEnrichmentConcurrency = 2;
 
     private string _searchText = string.Empty;
+    private bool _isDarkMode;
     private bool _isLoadingList;
     private string _listErrorMessage = string.Empty;
     private string _listStatusText = string.Empty;
@@ -29,10 +32,13 @@ public sealed class MainViewModel : ObservableObject
     private string _detailsErrorMessage = string.Empty;
     private PokemonDetailsViewModel? _pokemonDetails;
 
-    public MainViewModel(IPokemonService pokemonService)
+    public MainViewModel(IPokemonService pokemonService, IThemeService themeService)
     {
         _pokemonService = pokemonService;
+        _themeService = themeService;
         _uiDispatcher = Dispatcher.CurrentDispatcher;
+
+        _isDarkMode = _themeService.CurrentTheme == AppTheme.Dark;
 
         FilteredPokemon = CollectionViewSource.GetDefaultView(_pokemon);
         FilteredPokemon.Filter = FilterPokemon;
@@ -45,6 +51,18 @@ public sealed class MainViewModel : ObservableObject
         _ = _uiDispatcher.InvokeAsync(
             async () => await RefreshAsync(),
             DispatcherPriority.Background);
+    }
+
+    public bool IsDarkMode
+    {
+        get => _isDarkMode;
+        set
+        {
+            if (SetProperty(ref _isDarkMode, value))
+            {
+                _themeService.ApplyTheme(value ? AppTheme.Dark : AppTheme.Light);
+            }
+        }
     }
 
     public ICollectionView FilteredPokemon { get; }

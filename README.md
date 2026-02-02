@@ -13,7 +13,7 @@ Pokemon Browser is a small WPF application built for the JoyConnect technical ch
 - Detail view shows: name, image, height, weight, all types, base stats
 - Commands (`ICommand`) + bindings, `ObservableCollection`, `DataTemplate`
 - Dependency injection via `Microsoft.Extensions.Hosting`
-- Bonus: loading indicators + in-memory caching in the service + disk image caching for sprites
+- Bonus: loading indicators + in-memory caching in the service layer
 
 ## How to Run
 

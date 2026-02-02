@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\PokemonBrowser.Application\PokemonBrowser.Application.csproj" />
@@ -12,6 +12,10 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Assets\" />
+  </ItemGroup>
+
   <PropertyGroup>
     <AssemblyName>PokemonBrowser.Presentation.Wpf</AssemblyName>
     <RootNamespace>PokemonBrowser.Presentation.Wpf</RootNamespace>
@@ -20,6 +24,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\app.ico</ApplicationIcon>
   </PropertyGroup>
 
 </Project>
