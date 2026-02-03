@@ -227,7 +227,7 @@ public sealed class MainViewModel : ObservableObject
                 return;
             }
 
-            await _uiDispatcher.InvokeAsync(() => item.SetSpriteImage(image), DispatcherPriority.Background);
+            await _uiDispatcher.InvokeAsync(() => item.SetSpriteImage(image), DispatcherPriority.Background, ct);
         }
         catch
         {
@@ -292,7 +292,7 @@ public sealed class MainViewModel : ObservableObject
         {
             if (string.IsNullOrWhiteSpace(details.ImageUrl))
             {
-                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background);
+                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background, ct);
                 return;
             }
 
@@ -302,14 +302,14 @@ public sealed class MainViewModel : ObservableObject
                 return;
             }
 
-            await _uiDispatcher.InvokeAsync(() => details.SetArtworkImage(image), DispatcherPriority.Background);
+            await _uiDispatcher.InvokeAsync(() => details.SetArtworkImage(image), DispatcherPriority.Background, ct);
         }
         catch
         {
             // best-effort
             try
             {
-                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background);
+                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background, ct);
             }
             catch
             {
