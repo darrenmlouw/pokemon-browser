@@ -9,7 +9,7 @@ Pokemon Browser is a small WPF application built for the JoyConnect technical ch
 - PokeAPI integration
   - `GET https://pokeapi.co/api/v2/pokemon?limit=151`
   - `GET https://pokeapi.co/api/v2/pokemon/{name}`
-- List view shows: name, sprite, primary type
+- List view shows: name, sprite
 - Detail view shows: name, image, height, weight, all types, base stats
 - Commands (`ICommand`) + bindings, `ObservableCollection`, `DataTemplate`
 - Dependency injection via `Microsoft.Extensions.Hosting`
@@ -60,7 +60,6 @@ This solution uses **Clean Architecture** with **MVVM** in the WPF presentation 
 
 ## Assumptions / Trade-offs
 
-- PokeAPI list endpoint doesn’t include types, so the app loads the list quickly, then enriches list items with their types in the background (throttled).
 - Height/weight are converted from PokeAPI units (decimeters/hectograms) to meters/kg.
 
 ## Notes
