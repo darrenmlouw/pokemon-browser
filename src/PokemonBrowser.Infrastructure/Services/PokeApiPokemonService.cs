@@ -69,8 +69,7 @@ public sealed class PokeApiPokemonService : IPokemonService
                     return new PokemonSummary(
                         Id: id,
                         Name: entry.Name,
-                        SpriteUrl: spriteUrl,
-                        Types: Array.Empty<string>());
+                        SpriteUrl: spriteUrl);
                 })
                 .ToList();
 

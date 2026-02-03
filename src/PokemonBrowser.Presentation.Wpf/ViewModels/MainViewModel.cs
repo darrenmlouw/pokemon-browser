@@ -18,8 +18,6 @@ public sealed class MainViewModel : ObservableObject
     private CancellationTokenSource? _loadCts;
     private CancellationTokenSource? _detailsCts;
 
-    private const int StartupTypeEnrichmentCount = 30;
-    private const int TypeEnrichmentConcurrency = 2;
 
     private string _searchText = string.Empty;
     private bool _isDarkMode;
@@ -198,10 +196,6 @@ public sealed class MainViewModel : ObservableObject
             }
 
             ListStatusText = $"Loaded {list.Count} Pokemon";
-
-            // Best-effort enrichment for primary type (list endpoint doesn't include it).
-            var items = _pokemon.Take(StartupTypeEnrichmentCount).ToList();
-            _ = Task.Run(() => EnrichListTypesAsync(items, ct), ct);
         }
         catch (OperationCanceledException)
         {
@@ -233,7 +227,7 @@ public sealed class MainViewModel : ObservableObject
                 return;
             }
 
-            await _uiDispatcher.InvokeAsync(() => item.SetSpriteImage(image), DispatcherPriority.Background);
+            await _uiDispatcher.InvokeAsync(() => item.SetSpriteImage(image), DispatcherPriority.Background, ct);
         }
         catch
         {
@@ -298,7 +292,7 @@ public sealed class MainViewModel : ObservableObject
         {
             if (string.IsNullOrWhiteSpace(details.ImageUrl))
             {
-                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background);
+                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background, ct);
                 return;
             }
 
@@ -308,44 +302,20 @@ public sealed class MainViewModel : ObservableObject
                 return;
             }
 
-            await _uiDispatcher.InvokeAsync(() => details.SetArtworkImage(image), DispatcherPriority.Background);
+            await _uiDispatcher.InvokeAsync(() => details.SetArtworkImage(image), DispatcherPriority.Background, ct);
         }
         catch
         {
             // best-effort
             try
             {
-                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background);
+                await _uiDispatcher.InvokeAsync(() => details.EndArtworkLoading(), DispatcherPriority.Background, ct);
             }
             catch
             {
                 // ignored
             }
         }
-    }
-
-    private async Task EnrichListTypesAsync(IReadOnlyList<PokemonListItemViewModel> items, CancellationToken ct)
-    {
-        await Task.Delay(350, ct).ConfigureAwait(false);
-
-        await Parallel.ForEachAsync(
-            items,
-            new ParallelOptions { MaxDegreeOfParallelism = TypeEnrichmentConcurrency, CancellationToken = ct },
-            async (item, token) =>
-            {
-                try
-                {
-                    var details = await _pokemonService.GetPokemonDetailsAsync(item.Name, cancellationToken: token).ConfigureAwait(false);
-                    var types = details.Types;
-                    await _uiDispatcher.InvokeAsync(
-                        () => item.EnrichTypes(types),
-                        DispatcherPriority.Background);
-                }
-                catch
-                {
-                    // best-effort
-                }
-            }).ConfigureAwait(false);
     }
 
     private bool FilterPokemon(object obj)
